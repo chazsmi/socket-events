@@ -6,18 +6,18 @@ Use case example would be an event comsumed on a queue that needed to be broadac
 
 ## Example set up
 ```Go
-    // Start listening for stock updates
-    foo := "foo"
-    bar := "bar"
-    eventsHandler := events.NewEventHandler()
-    go eventsHandler.Init()
-    eventsHandler.EventRec <- events.Event{
-        Ref: &foo,
-        Data: map[string]interface{}{
-            "foo": foo,
-            "bar": bar,
-        },
-    }
+// Start listening for stock updates
+foo := "foo"
+bar := "bar"
+eventsHandler := events.NewEventHandler()
+go eventsHandler.Init()
+eventsHandler.EventRec <- events.Event{
+    Ref: &foo,
+    Data: map[string]interface{}{
+        "foo": foo,
+        "bar": bar,
+    },
+}
 
 // Web server & web socket set up...
 ```
