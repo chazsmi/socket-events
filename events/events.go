@@ -31,7 +31,7 @@ type Handler struct {
 }
 
 type Event struct {
-	// To the reference to be compared
+	// The reference to be compared upon
 	Ref  *string
 	Data map[string]interface{}
 }
@@ -51,7 +51,7 @@ func (h *Handler) Init() {
 			continue
 		}
 
-		// Broadcast to the events with a ref
+		// Broadcast to the events with the event ref
 		go h.BroadcastEvent(event, *event.Ref)
 		// To all listeners that want all events
 		go h.BroadcastEvent(event, "")
