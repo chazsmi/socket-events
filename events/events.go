@@ -79,7 +79,7 @@ func (h *Handler) BroadcastEvent(event Event, ref string) error {
 }
 
 func (h *Handler) RegisterEvent(c *Connection) {
-	log.Println("Registering WS Stock Handler from", c.Ws.LocalAddr().String())
+	log.Println("Registering Handler from", c.Ws.LocalAddr().String())
 	h.eventsLock.Lock()
 	defer h.eventsLock.Unlock()
 	if _, found := h.EventsStore[c.Ref]; !found {
