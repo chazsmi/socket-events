@@ -10,6 +10,9 @@ foo := "foo"
 bar := "bar"
 eventsHandler := events.NewEventHandler()
 go eventsHandler.Init()
+
+// Event comes in via transport eg message bus
+
 // Pass your event to the handlers channel
 eventsHandler.EventRec <- events.Event{
     Ref: &foo,
