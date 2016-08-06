@@ -6,6 +6,7 @@ Use case example would be an event comsumed on a queue that needed to be broadac
 
 ## Example set up
 ```Go
+// Set up
 foo := "foo"
 bar := "bar"
 eventsHandler := events.NewEventHandler()
@@ -14,7 +15,7 @@ go eventsHandler.Init()
 // Event comes in via transport eg message bus
 
 // Pass your event to the handlers channel
-eventsHandler.EventRec <- events.Event{
+eventsHandler.Receive <- events.Event{
     Ref: &foo,
     Data: map[string]interface{}{
         "foo": foo,

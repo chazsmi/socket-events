@@ -22,12 +22,12 @@ func (c Connection) Close() {
 }
 
 type Handler struct {
-	// Channel to receive the events on
-	EventRec   chan Event
+	// Channel to Receive the events on
+	Receive    chan Event
 	eventsLock sync.RWMutex
 
 	// Store of events being listened for
-	EventsStore map[string]map[*websocket.Conn]*Connection
+	Store map[string]map[*websocket.Conn]*Connection
 }
 
 type Event struct {
@@ -38,14 +38,14 @@ type Event struct {
 
 func NewEventHandler() *Handler {
 	return &Handler{
-		EventRec:    make(chan Event),
-		EventsStore: make(map[string]map[*websocket.Conn]*Connection),
+		Receive: make(chan Event),
+		Store:   make(map[string]map[*websocket.Conn]*Connection),
 	}
 }
 
 func (h *Handler) Init() {
 	for {
-		event := <-h.EventRec
+		event := <-h.Receive
 		if event.Ref == nil {
 			log.Printf("Ref not provided or nil... %+v", event)
 			continue
@@ -69,7 +69,7 @@ func (h *Handler) BroadcastEvent(event Event, ref string) error {
 	}
 
 	// Send the result back to every socket listening
-	for _, conn := range h.EventsStore[ref] {
+	for _, conn := range h.Store[ref] {
 		if err := websocket.JSON.Send(conn.Ws, string(js)); err != nil {
 			conn.Ws.Close()
 			return err
@@ -82,14 +82,14 @@ func (h *Handler) RegisterEvent(c *Connection) {
 	log.Println("Registering Handler from", c.Ws.LocalAddr().String())
 	h.eventsLock.Lock()
 	defer h.eventsLock.Unlock()
-	if _, found := h.EventsStore[c.Ref]; !found {
-		h.EventsStore[c.Ref] = make(map[*websocket.Conn]*Connection)
+	if _, found := h.Store[c.Ref]; !found {
+		h.Store[c.Ref] = make(map[*websocket.Conn]*Connection)
 	}
-	h.EventsStore[c.Ref][c.Ws] = c
+	h.Store[c.Ref][c.Ws] = c
 }
 
 func (h *Handler) UnregisterEvent(c Connection) {
 	h.eventsLock.Lock()
 	defer h.eventsLock.Unlock()
-	delete(h.EventsStore[c.Ref], c.Ws)
+	delete(h.Store[c.Ref], c.Ws)
 }
