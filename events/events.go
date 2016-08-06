@@ -50,7 +50,6 @@ func (h *Handler) Init() {
 			log.Printf("Ref not provided or nil... %+v", event)
 			continue
 		}
-		log.Println("see event")
 
 		// Broadcast to the events with the event ref
 		go h.BroadcastEvent(event, *event.Ref)
@@ -65,7 +64,7 @@ func (h *Handler) BroadcastEvent(event Event, ref string) {
 
 	js, err := json.Marshal(event.Data)
 	if err != nil {
-		log.Println("Json marshal error after proto: ", err)
+		log.Println("Json marshal error: ", err)
 		return
 	}
 
