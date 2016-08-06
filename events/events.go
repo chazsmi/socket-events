@@ -50,6 +50,7 @@ func (h *Handler) Init() {
 			log.Printf("Ref not provided or nil... %+v", event)
 			continue
 		}
+		log.Println("see event")
 
 		// Broadcast to the events with the event ref
 		go h.BroadcastEvent(event, *event.Ref)
@@ -58,30 +59,29 @@ func (h *Handler) Init() {
 	}
 }
 
-func (h *Handler) BroadcastEvent(event Event, ref string) error {
+func (h *Handler) BroadcastEvent(event Event, ref string) {
 	h.eventsLock.RLock()
 	defer h.eventsLock.RUnlock()
 
 	js, err := json.Marshal(event.Data)
 	if err != nil {
 		log.Println("Json marshal error after proto: ", err)
-		return err
+		return
 	}
 
 	// Send the result back to every socket listening
 	for _, conn := range h.Store[ref] {
 		if err := websocket.JSON.Send(conn.Ws, string(js)); err != nil {
 			conn.Ws.Close()
-			return err
 		}
 	}
-	return nil
 }
 
 func (h *Handler) RegisterEvent(c *Connection) {
 	log.Println("Registering Handler from", c.Ws.LocalAddr().String())
 	h.eventsLock.Lock()
 	defer h.eventsLock.Unlock()
+	c.Done = make(chan bool)
 	if _, found := h.Store[c.Ref]; !found {
 		h.Store[c.Ref] = make(map[*websocket.Conn]*Connection)
 	}
